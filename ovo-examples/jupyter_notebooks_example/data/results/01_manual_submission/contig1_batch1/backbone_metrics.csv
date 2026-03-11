@@ -1,0 +1,2 @@
+id,radius_of_gyration,glycosolated_binder_residues,pydssp_str,pydssp_loop_percent,pydssp_helix_percent,pydssp_strand_percent
+contig1_batch1_0_standardized,13.764276791571724,,-HHHHHHHHHHHHHHHHH---HHHHHHHHHHHHH---HHHHHHHHHHHHHH----------HHHHHHHHHHHHHHHHHHHHH--HHHHHHHHHHHHHHH-,20.0,80.0,0.0

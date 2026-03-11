@@ -1,0 +1,12 @@
+{
+    "design_path": "output",
+    "starting_pdb": "target.pdb",
+    "binder_name": "design",
+    "chains": "E",
+    "target_hotspot_residues": "E64,E88,E96",
+    "lengths": [
+        50,
+        60
+    ],
+    "number_of_final_designs": 1
+}

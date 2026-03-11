@@ -1,0 +1,18 @@
+{
+  "account_id" : {
+    "description" : "The AWS Account ID (for container lookup), set automatically by the workflow.",
+    "optional" : false
+  },
+  "aws_region" : {
+    "description" : "The AWS Region (for container lookup), set automatically by the workflow.",
+    "optional" : false
+  },
+  "workflow_bucket" : {
+    "description": "The S3 bucket used to workflow inputs and results, set automatically by the workflow",
+    "optional": false
+  },
+  "reference_files_dir" : {
+    "description" : "Path to models directory on filesystem - sent by OVO but UNUSED in HealthOmics",
+    "optional" : false
+  }
+}

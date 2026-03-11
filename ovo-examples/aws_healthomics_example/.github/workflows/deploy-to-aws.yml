@@ -1,0 +1,99 @@
+name: Deploy to AWS HealthOmics and Posit
+run-name: ${{ github.actor }} started deployment to [${{ inputs.environment != '' && inputs.environment || 'dev' }}]!
+on:
+  push:
+    branches: 
+      - develop
+  workflow_dispatch: 
+    inputs:
+      environment:
+        description: Choose which environment you want to deploy to.
+        required: true
+        type: environment
+        default: dev
+      dry_run:
+        description: Run only Terraform Plan (skip Apply)
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  Terraform-Deployment:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment != '' && inputs.environment || 'dev' }}
+    env:
+      TF_LOG: INFO
+      TF_VAR_resource_prefix: ${{ vars.RESOURCE_PREFIX }}
+      TF_VAR_aws_account_number: ${{ vars.AWS_ACCOUNT_NUMBER }}
+      TF_VAR_aws_region: ${{ vars.AWS_REGION }}
+    steps:
+      - name: 'Environment Name: ${{ env.TF_VAR_resource_prefix }}'
+        working-directory: ./
+        run: echo Environment = ${{ env.TF_VAR_resource_prefix }}
+
+      - name: Checkout from GitHub
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+          token: ${{ secrets.OVO_GITHUB_TOKEN }} # This is needed only when using an internal or private fork
+
+      - name: List files
+        run: ls -lR
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4 # seems to be required for terraform init, see https://github.com/hashicorp/setup-terraform/issues/84
+        with:
+          node-version: '20'
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ vars.AWS_REGION }}
+          role-to-assume: ${{ vars.AWS_DEPLOYMENT_ROLE }}
+
+      - name: Terraform Init
+        working-directory: ./terraform
+        run: terraform init -input=false -backend-config ${{ vars.RESOURCE_PREFIX }}-backend.conf
+
+      - name: Terraform Plan
+        working-directory: ./terraform
+        run: terraform plan -input=false
+
+      - name: Terraform Apply
+        if: inputs.dry_run == false
+        working-directory: ./terraform
+        run: terraform apply -input=false -auto-approve
+
+  Posit-Deployment:   
+    runs-on: ubuntu-latest
+    needs: Terraform-Deployment
+    environment: ${{ inputs.environment != '' && inputs.environment || 'dev' }}
+    steps:
+      - name: Checkout from GitHub
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+          token: ${{ secrets.OVO_GITHUB_TOKEN }} # This is needed only when using an internal or private fork
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install rsconnect
+        run: pip install --upgrade rsconnect-python
+
+      - name: Deploy app to Posit
+        env:
+            POSIT_API_KEY: ${{ secrets.POSIT_API_KEY }}
+            POSIT_SERVER: ${{ vars.POSIT_SERVER }}
+            POSIT_APP_ID: ${{ vars.POSIT_APP_ID }}
+            OVO_CONFIG_DIR: ${{ vars.OVO_CONFIG_DIR }}
+        run: posit/posit_deploy.sh

@@ -1,0 +1,1 @@
+nextflow < 24.11  # in case your Posit platform uses an older version of Java than 17

@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com///nextflow_schema.json",
+  "title": "PyRosetta Interface Metrics",
+  "description": "",
+  "type": "object",
+  "required": ["pdb_dir"],
+  "properties": {
+    "pdb_dir": {
+      "type": "string",
+      "description": "Directory containing PDB files to evaluate"
+    },
+    "relax": {
+      "type": "boolean",
+      "description": "Apply FastRelax protocol before interface analysis",
+      "default": false
+    },
+    "publish_dir": {
+      "type": "string"
+    },
+    "docker_repository": {
+      "type": "string"
+    }
+  }
+}

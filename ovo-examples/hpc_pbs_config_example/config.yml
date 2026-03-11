@@ -1,0 +1,33 @@
+db:
+  url: sqlite:///ovo.db
+  verbose: false
+reference_files_dir: ./reference_files
+auth:
+  admin_users: ["someuser"]
+storage:
+  verbose: false
+  path: ./storage
+licenses:
+  pyrosetta: true
+schedulers:
+  pbs_singularity:
+    name: PBS Singularity
+    type: NextflowScheduler
+    submission_args:
+      config: ./pbs_singularity.config
+    workdir: ./workdir
+  pbs_conda_gpu:
+    name: PBS Conda
+    type: NextflowScheduler
+    submission_args:
+      conda: true
+      config: ./pbs_conda.config
+    workdir: ./workdir
+  local_gpu:
+    name: Local with Singularity GPU
+    type: NextflowScheduler
+    submission_args:
+      max_memory: 15G
+      config: ./local_singularity.config
+    workdir: ./workdir
+
