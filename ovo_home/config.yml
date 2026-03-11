@@ -1,0 +1,45 @@
+
+db:
+  url: sqlite:///ovo.db
+  verbose: false
+reference_files_dir: ./reference_files
+nextflow_home: ./nextflow
+auth:
+  admin_users: []
+  allow_private_project_link_access: true
+storage:
+  verbose: false
+  path: ./storage
+# Customize number of threads for parallel read/write operations on Storage such as sync_files, create_zip, ...
+#  num_copy_threads: 16
+# Example of a storage path on AWS S3:
+#  path: s3://bucket-name/ovo/storage/
+#  aws:
+#    region: us-east-1
+#    assume_role_arn: arn:aws:iam::YOUR_ACCOUNT_ID:role/YOUR-ROLE (or null if not assuming a different role)
+props:
+  pyrosetta_license: true
+  read_only: false
+  rfdiffusion_backbones_limit: 1000
+  rfdiffusion_backbones_limit_admin: 5000
+  mpnn_sequences_limit: 100
+default_scheduler: local_conda
+local_scheduler: local_conda
+schedulers:
+  local_conda:
+    name: Local with conda
+    type: NextflowScheduler
+    submission_args:
+      # using CPU version of dependencies, remove 'cpu_env' if your local machine has a GPU
+      profile: conda,cpu_env
+      max_memory: 8GB
+      config: ./nextflow_local.config
+    workdir: ./workdir
+# Plugin-specific configuration can go here, for example:
+# plugins:
+#   ovo_plugin_name:
+#     key: value
+# Uncomment to customize web page content
+# templates:
+#     welcome: templates/welcome.md
+#     welcome_appendix: templates/welcome_appendix.md
