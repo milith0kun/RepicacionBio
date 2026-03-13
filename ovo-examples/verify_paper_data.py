@@ -1,16 +1,29 @@
 # -*- coding: utf-8 -*-
 """
 Verificacion de datos OVO vs Paper
-Usa el CSV completo (ovo_examples_all.csv.gz) que tiene TODOS los disenos
-y la tabla de jobs (ovo_publication_examples_1_jobs.csv) con los parametros
+Usa el CSV completo (ovo_examples_all.csv.gz) y la tabla de jobs.
+Ruta: OVO_RESULTS_DIR o jupyter_notebooks_example/data/results.
 """
 import pandas as pd
 import os
 
-data_dir = r'd:\ProyectosUniversidad\BioInformatica\ovo-examples\jupyter_notebooks_example\data\results'
-designs = pd.read_csv(os.path.join(data_dir, 'ovo_examples_all.csv.gz'), index_col=0)
-jobs = pd.read_csv(os.path.join(data_dir, 'ovo_publication_examples_1_jobs.csv'), index_col=0, header=[0,1])
+def _find_results_dir():
+    candidates = [
+        os.environ.get("OVO_RESULTS_DIR"),
+        os.path.join(os.getcwd(), "jupyter_notebooks_example", "data", "results"),
+        os.path.join(os.getcwd(), "..", "jupyter_notebooks_example", "data", "results"),
+        os.path.abspath(os.path.join(os.path.dirname(__file__) or ".", "jupyter_notebooks_example", "data", "results")),
+    ]
+    for p in candidates:
+        if p and os.path.isdir(p):
+            return os.path.abspath(p)
+    return os.path.abspath(os.path.join(os.getcwd(), "jupyter_notebooks_example", "data", "results"))
 
+data_dir = _find_results_dir()
+designs = pd.read_csv(os.path.join(data_dir, "ovo_examples_all.csv.gz"), index_col=0)
+jobs = pd.read_csv(os.path.join(data_dir, "ovo_publication_examples_1_jobs.csv"), index_col=0, header=[0, 1])
+
+print("RESULTS_DIR:", data_dir)
 print('=' * 70)
 print('VERIFICACION SISTEMATICA: DATOS OVO vs PAPER')
 print('Fuente: ovo_examples_all.csv.gz (CSV completo con todos los disenos)')
@@ -221,11 +234,15 @@ print('=' * 70)
 threshold_cols = [c for c in jobs.columns if 'Thresholds' in str(c)]
 for pid in ['ogc','jov','xeh','zuk','avz','mmo','bbc','qki','rsj']:
     if pid in jobs.index:
-        print(f'\n  {pid} ({jobs.loc[pid, ("Pool","name")]}):')
+        name = jobs.loc[pid, ("Pool","name")]
+        if isinstance(name, str):
+            name = name.encode('ascii', 'replace').decode('ascii')
+        print(f'\n  {pid} ({name}):')
         for col in threshold_cols:
             val = jobs.loc[pid, col]
             if pd.notna(val):
-                print(f'    {col[1]}: {val}')
+                val_str = str(val).encode('ascii', 'replace').decode('ascii')
+                print(f'    {col[1]}: {val_str}')
 
 # ============================================================
 # RESUMEN

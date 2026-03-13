@@ -1,0 +1,16 @@
+pdb,nombre,resol,uso,aplicacion
+1A4I,Oxidoreductasa (sitio activo),2.0,Scaffold,Enzima
+5IUS,PD-1/PD-L1,2.5,Scaffold,Inmuno-oncología
+4ZXB,Receptor insulina,1.9,Binder,Diabetes
+6PXV,Receptor insulina (cryo-EM),3.2,Binder,Diabetes
+4FNK,Hemaglutinina influenza,2.2,Binder,Vacunas
+1MOX,EGFR (dominio),2.6,Binder,Cáncer
+4UV7,EGFR,2.8,Binder,Cáncer
+3KFD,TGF-beta,2.1,Binder,Inmunología
+6OPJ,SARS-CoV-2 RBD,2.5,Binder,Antivirales
+5ELI,Lisozima (benchmark),1.5,Scaffold/Binder,Benchmark
+2PTC,Tripsina,1.9,Binder,Enzima
+1HZH,p53 (dominio),2.2,Binder,Cáncer
+7KMS,Spike SARS-CoV-2,2.8,Binder,Antivirales
+3BDY,BRCA1 (RING),2.0,Binder,Cáncer
+1F4S,CD4 (dominio),2.0,Binder,Inmunología

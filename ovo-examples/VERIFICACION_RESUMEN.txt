@@ -1,0 +1,83 @@
+================================================================================
+RESUMEN DE VERIFICACION - Notebooks OVO vs Paper (Tesis)
+================================================================================
+Fecha: ejecucion de checklist completa.
+Objetivo: Que los Colabs cumplan con lo que hicieron los investigadores usando
+la API/backend de OVO y que con datos de la tesis se repliquen los pasos.
+
+--------------------------------------------------------------------------------
+1. NOTEBOOK 01 (01_export_all.ipynb)
+--------------------------------------------------------------------------------
+[OK] Conecta con BD OVO via ovo_home (OVO_HOME).
+[OK] Proyecto "OVO Publication Examples 1" existe; 10 pools (efm, ogc, jov, rsj, avz, mmo, qki, bbc, xeh, zuk).
+[OK] design_logic.get_design_jobs_table(project.id) devuelve tabla de jobs con parametros (contigs, hotspots, umbrales).
+[OK] db.Design.select_dataframe + descriptor_logic.get_wide_descriptor_table: 898 disenos, 169 columnas (en BD tesis).
+[OK] Descriptores del paper presentes: AF2 PAE, AF2 pLDDT, AF2 Design RMSD, AF2 Native Motif RMSD, AF2 iPAE, Rosetta ddG, etc.
+[OK] Rutas de export: RESULTS_DIR configurable (OVO_RESULTS_DIR). Por defecto: jupyter_notebooks_example/data/results.
+
+Nota: En la BD de la tesis el CSV exportado puede contener solo disenos aceptados por pool; entonces el "total" por pool en el CSV coincide con "aceptados" (no con el total generado en el run). El paper cita totales de corrida (ej. 5000 para xeh) y aceptados (275); el CSV tiene 275 filas para xeh.
+
+--------------------------------------------------------------------------------
+2. NOTEBOOK 02 (02_stats_and_plots.ipynb)
+--------------------------------------------------------------------------------
+[OK] Usa los mismos datos que el Paso 1: si OVO_HOME definido -> backend OVO (db.Design + descriptor_logic.get_wide_descriptor_table); si no -> CSVs en RESULTS_DIR (ovo_examples_all.csv.gz, ovo_publication_examples_1_jobs.csv). RESULTS_DIR = mismo que Notebook 01.
+[OK] Celda de carga con verificacion: imprime fuente (OVO/CSV), total disenos, aceptados por pool, y comprueba columnas del paper (AF2 PAE, AF2 Design RMSD, AF2 Native Motif RMSD, AF2 iPAE, AF2 Target-aligned Binder RMSD, Rosetta ddG).
+[OK] Fig 2c: scatter AF2 PAE vs Design RMSD y vs Native Motif RMSD (scaffold PD-1 zuk/xeh); oxidoreductasa ogc/jov en seccion A. Umbrales paper PAE<5, pLDDT>80, Design RMSD<2, Native Motif RMSD<1.5 o 2.
+[OK] Fig 3: histograma Rosetta ddG (binder mmo, avz, bbc); metricas iPAE<10, Binder RMSD<2, pLDDT>80, ddG<-30.
+[OK] Columnas necesarias en ovo_examples_all.csv.gz (170 cols): AF2 PAE, AF2 Design RMSD, AF2 Native Motif RMSD, AF2 iPAE, AF2 Target-aligned Binder RMSD, AF2 Binder pLDDT, Rosetta ddG, accepted, pool_id.
+
+--------------------------------------------------------------------------------
+3. NOTEBOOK 03 (03_graficas_3d_proteinas_figura2.ipynb)
+--------------------------------------------------------------------------------
+[OK] Panel (a) Fig 2: 1A4I, residuos 56, 100, 125 (oxidoreductasa) resaltados; descarga RCSB, py3Dmol.
+[OK] Panel (d) Fig 2: 5IUS, segmentos 63-82 y 119-140 cadena A (interfaz PD-1); colores naranja/azul.
+[OK] Salida: OUT_DIR configurable (OVO_FIGURES_DIR); por defecto local PaperReplicado/figuras.
+
+  --- CONFIRMACION: 3 SISTEMAS vs 4 PDB vs 4 GRAFICOS ---
+  - 3 proteinas/sistemas del paper: (1) Oxidoreductasa 1A4I, (2) PD-1 5IUS, (3) Receptor insulina (4ZXB/6PXV).
+  - 4 archivos PDB que se descargan/muestran: 1A4I, 5IUS, 4ZXB, 6PXV. El sistema "insulina" usa 2 PDBs (4ZXB y 6PXV).
+  - Fig 2 tiene 4 paneles (graficos): (a) vista 3D 1A4I, (b) grafico metricas, (c) grafico metricas, (d) vista 3D 5IUS.
+  Resumen: 3 sistemas -> 4 PDB (porque insulina son 2 estructuras); Fig 2 = 4 graficos (2 vistas 3D + 2 graficos de metricas).
+
+--------------------------------------------------------------------------------
+4. DATOS DE LA TESIS (ovo_home)
+--------------------------------------------------------------------------------
+[OK] 898 disenos en CSV (361 corresponden a los 3 tipos del paper + pool efm con 537 disenos).
+[OK] Numero de aceptados por pool del paper coincide: ogc 26, xeh 275, zuk 1, avz 5, mmo 1, bbc 3, qki 37, rsj 13; jov 0.
+[OK] Umbrales en jobs (tabla exportada) coinciden con paper: scaffold PAE<=5, Design RMSD<=2, etc.; binder iPAE<=10, ddG<=-30.
+
+Pool "efm": presente en la tesis (537 disenos); no es uno de los 3 tipos del paper. Incluido en el export total (898).
+
+--------------------------------------------------------------------------------
+5. DATOS DE EJECUCION (revision acorde a la tesis)
+--------------------------------------------------------------------------------
+CSVs en jupyter_notebooks_example/data/results/ (salida del Notebook 01):
+
+  ovo_publication_examples_1_jobs.csv : 10 filas (una por pool), 50 columnas.
+  ovo_examples_all.csv.gz            : 898 disenos, 170 columnas.
+
+Conteos vs tesis:
+  - Pools del proyecto     : 10 (efm, ogc, jov, rsj, avz, mmo, qki, bbc, xeh, zuk) [OK]
+  - Diseños totales       : 898 [OK]
+  - Pools del paper (9)    : 361 diseños aceptados (ogc 26, xeh 275, zuk 1, avz 5, mmo 1, bbc 3, qki 37, rsj 13, jov 0) [OK]
+  - Pool efm (extra)      : 537 diseños [OK]
+  - Columna accepted      : 898 = 361 + 537 [OK]
+
+Conclusion: Los datos de ejecucion del Notebook 01 y los CSVs exportados estan acordes a la tesis.
+
+--------------------------------------------------------------------------------
+6. EJECUCION DE VERIFICACION
+--------------------------------------------------------------------------------
+Comando: cd ovo-examples && python verify_paper_data.py
+- Usa OVO_RESULTS_DIR o busca jupyter_notebooks_example/data/results.
+- Compara conteos por pool y umbrales con el paper; reporta coincidencias y diferencias.
+- Las diferencias "total" (paper 5000 vs datos 275) son esperables si el CSV solo contiene aceptados.
+
+--------------------------------------------------------------------------------
+7. VARIABLES DE ENTORNO UTILES
+--------------------------------------------------------------------------------
+OVO_HOME          : ruta a ovo_home (BD y config). Obligatorio para Notebook 01.
+OVO_RESULTS_DIR   : ruta donde 01 escribe CSVs y 02 los lee. Opcional; por defecto jupyter_notebooks_example/data/results.
+OVO_FIGURES_DIR   : ruta donde 03 guarda HTML/PNG. Opcional; por defecto PaperReplicado/figuras.
+
+================================================================================
